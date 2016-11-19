@@ -4,7 +4,12 @@
         <title>FlaskTaskr</title>
         <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}">
         <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    </head>
+    </head><br><br>
+    {% for post in posts %}
+        <strong>Ttile:</strong> {{ post.title }} <br>
+        <strong>Description:</strong> {{ post.description }} <br>
+    <br>
+    {% endfor %}
     <body>
         <br/>
         <div class="container">
