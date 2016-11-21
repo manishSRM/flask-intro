@@ -1,2 +1,2 @@
 # flask-intro
-Learning Flase
+Learning Flask
