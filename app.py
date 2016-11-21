@@ -1,10 +1,18 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash, g
+from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask_sqlalchemy import SQLAlchemy
 from functools import wraps
-import sqlite3
+
+# import sqlite3
 
 app = Flask(__name__)
-app.secret_key = "my key"
-app.database = "sample.db"
+
+# config
+app.config.from_object('config.DevelopmentConfig')
+
+
+# create the SQLAlchemy object
+db = SQLAlchemy(app)
+from models import *
 
 def login_required(f):
     @wraps(f)
@@ -20,14 +28,7 @@ def login_required(f):
 @login_required
 def home():
     # return "Hello World!!"
-    g.db = connect_db()
-    cur = g.db.execute('select * from posts')
-    posts = []
-    for row in cur.fetchall():
-        posts.append(dict(title=row[0], description=row[1]))
-
-    # posts = [dict(title = row[0], description = row[1]) for row in cur.fetchall()]
-    g.db.close()
+    posts = db.session.query(BlogPost).all()
     return render_template("template.html", posts=posts)
 
 @app.route('/welcome')
@@ -39,7 +40,7 @@ def login():
     error = None
     if request.method == 'POST':
         if request.form['username'] != 'admin' or request.form['password'] != "admin":
-            error = "u r not an admin!!"
+            error = "Wrong admin!"
             return render_template('login.html', error=error)
         else:
             session['logged_in'] = True
@@ -50,12 +51,12 @@ def login():
 @app.route('/logout')
 def logout():
     session.pop('logged_in', None)
-    flash("you are just logged out!")
+    flash("You are just logged out!")
     return redirect(url_for('welcome'))
 
 
-def connect_db():
-    return sqlite3.connect(app.database)
+# def connect_db():
+#     return sqlite3.connect('posts.db')
 
 
 
